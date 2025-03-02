@@ -11,3 +11,10 @@ cmake %CMAKE_ARGS% -DBUILD_SHARED_LIBS=ON -DSDL_LIBC=ON -A %2 %REPO_PATH%
 cmake --build . --config Release -v
 cmake --install . --prefix ..\install_%1 --config Release -v
 cd ..
+echo "Listing contents of the build directory..."
+dir build_%1 /S
+
+echo "Listing contents of the installation directory..."
+dir ..\install_%1 /S
+
+cd ..
