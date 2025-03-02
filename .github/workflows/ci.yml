@@ -50,25 +50,28 @@ jobs:
           elif [ "${{ runner.os }}" == "macOS" ]; then
             brew install nasm
           fi
+        shell: bash
 
       - name: Install Vulkan SDK
+        if: ${{ runner.os == 'Windows' }}
         run: |
-          if [ "${{ runner.os }}" == "Windows" ]; then
-            curl -o vulkan_sdk.exe https://sdk.lunarg.com/sdk/download/latest/windows/vulkan_sdk.exe
-            ./vulkan_sdk.exe --root C:\Vulkan --accept-licenses --default-answer --confirm-command install
-          fi
+          curl -o vulkan_sdk.exe https://sdk.lunarg.com/sdk/download/latest/windows/vulkan_sdk.exe
+          ./vulkan_sdk.exe --root C:\Vulkan --accept-licenses --default-answer --confirm-command install
+        shell: pwsh
 
       - name: Build and Test
         run: |
-          mkdir build && cd build
-          mkdir SDL && cd SDL
+          mkdir build
+          cd build
+          mkdir SDL
+          cd SDL
           if [ "${{ runner.os }}" == "Windows" ]; then
             ..\..\build-sdl.bat ${{ matrix.cmake_tuple }}
           else
             ../../build-sdl.sh
           fi
           cd ..
-          # Add other directories and build commands similarly
+        shell: bash
 
       - name: Archive Artifacts
         if: ${{ runner.os == 'Windows' }}
