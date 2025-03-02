@@ -1,0 +1,82 @@
+name: CI Build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            platform: x64
+            cmake_tuple: x64-x64
+            openssl_tuple: x64-amd64-VC-WIN64A
+            ffmpeg_tuple: x64-amd64
+            libplacebo_tuple: x64-CLANG64
+          - os: windows-latest
+            platform: ARM64
+            cmake_tuple: ARM64-ARM64
+            openssl_tuple: arm64-amd64_arm64-VC-WIN64-ARM
+            ffmpeg_tuple: arm64-amd64_arm64
+            libplacebo_tuple: ARM64-CLANGARM64
+          - os: windows-latest
+            platform: x86
+            cmake_tuple: x86-x86
+            openssl_tuple: x86-x86-VC-WIN32
+            ffmpeg_tuple: x86-x86
+            libplacebo_tuple: x86-CLANG32
+          - os: macos-11.0
+            platform: macOS
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Initialize Submodules
+        run: git submodule update --init
+
+      - name: Install NASM
+        run: |
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            choco install nasm -y
+          elif [ "${{ runner.os }}" == "macOS" ]; then
+            brew install nasm
+          fi
+
+      - name: Install Vulkan SDK
+        run: |
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            curl -o vulkan_sdk.exe https://sdk.lunarg.com/sdk/download/latest/windows/vulkan_sdk.exe
+            ./vulkan_sdk.exe --root C:\Vulkan --accept-licenses --default-answer --confirm-command install
+          fi
+
+      - name: Build and Test
+        run: |
+          mkdir build && cd build
+          mkdir SDL && cd SDL
+          if [ "${{ runner.os }}" == "Windows" ]; then
+            ..\..\build-sdl.bat ${{ matrix.cmake_tuple }}
+          else
+            ../../build-sdl.sh
+          fi
+          cd ..
+          # Add other directories and build commands similarly
+
+      - name: Archive Artifacts
+        if: ${{ runner.os == 'Windows' }}
+        run: cmd /c archive.bat ${{ matrix.platform }}
+        shell: cmd
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-${{ matrix.platform }}
+          path: path/to/artifacts
