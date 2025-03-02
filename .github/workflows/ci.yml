@@ -65,8 +65,8 @@ jobs:
           cd build
           mkdir SDL
           cd SDL
-          if [ "${{ runner.os }}" == "Windows" ]; then
-            ..\..\build-sdl.bat ${{ matrix.cmake_tuple }}
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            cmd.exe /C "..\..\build-sdl.bat ${{ matrix.cmake_tuple }}"
           else
             ../../build-sdl.sh
           fi
