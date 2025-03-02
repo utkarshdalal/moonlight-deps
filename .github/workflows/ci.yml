@@ -86,7 +86,7 @@ jobs:
         run: |
             mkdir SDL_ttf
             cd SDL_ttf
-            ..\..\build-sdl-ttf.bat ${{ matrix.cmake_tuple }}
+            ..\build-sdl-ttf.bat ${{ matrix.cmake_tuple }}
             cd ..
         shell: cmd
 
@@ -94,7 +94,7 @@ jobs:
         run: |
             mkdir openssl
             cd openssl
-            ..\build-openssl.bat ${{ matrix.openssl_build_tuple }}
+            ..\build-openssl.bat ${{ matrix.openssl_tuple }}
             cd ..
         if: matrix.os == 'windows-latest'
         shell: cmd
@@ -114,15 +114,15 @@ jobs:
         run: |
             mkdir libplacebo
             cd libplacebo
-            ..\build-libplacebo-windows.bat ${{ matrix.libplacebo_build_tuple }}
+            cmd /c ..\build-libplacebo-windows.bat ${{ matrix.libplacebo_tuple }}
             cd ..
         shell: cmd
-
+      
       - name: Build dav1d
         run: |
             mkdir dav1d
             cd dav1d
-            ..\..\build-dav1d.bat ${{ matrix.ffmpeg_build_tuple }}
+            ..\build-dav1d.bat ${{ matrix.ffmpeg_tuple }}
             cd ..
         if: matrix.os == 'windows-latest'
         shell: cmd
@@ -146,7 +146,7 @@ jobs:
         run: |
             mkdir FFmpeg
             cd FFmpeg
-            ..\build-ffmpeg-windows.bat ${{ matrix.ffmpeg_build_tuple }}
+            ..\build-ffmpeg-windows.bat ${{ matrix.ffmpeg_tuple }}
             cd ..
         shell: cmd
 
