@@ -136,17 +136,12 @@ jobs:
         if: matrix.os != 'windows-latest'
         shell: bash
 
-      - name: Archive Artifacts
-        if: ${{ runner.os == 'Windows' }}
-        run: cmd /c archive.bat ${{ matrix.platform }}
-        shell: cmd
-
       - name: Build FFmpeg (Windows)
         if: matrix.os == 'windows-latest'
         run: |
             mkdir FFmpeg
             cd FFmpeg
-            ..\build-ffmpeg-windows.bat ${{ matrix.ffmpeg_tuple }}
+            cmd /c ..\build-ffmpeg-windows.bat ${{ matrix.ffmpeg_tuple }}
             cd ..
         shell: cmd
 
@@ -197,6 +192,11 @@ jobs:
           ../../build-discord-rpc.sh arm64 arm64
           cd ..
         shell: bash
+
+      - name: Archive Artifacts
+        if: ${{ runner.os == 'Windows' }}
+        run: cmd /c archive.bat ${{ matrix.platform }}
+        shell: cmd
 
       - name: Upload Artifact (Zip)
         uses: actions/upload-artifact@v4
