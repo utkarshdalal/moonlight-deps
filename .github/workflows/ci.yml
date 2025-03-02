@@ -81,15 +81,59 @@ jobs:
         if: runner.os != 'Windows'
         shell: bash
 
-      - name: Debug Build Output
+      - name: Build SDL_ttf (Windows)
+        if: matrix.os == 'windows-latest'
         run: |
-          echo "Listing contents of the build directory recursively:"
-          if [[ $RUNNER_OS == 'Windows' ]]; then
-            # Using Powershell command to list directories since 'dir' is not directly compatible in bash on Windows
-            powershell -Command "Get-ChildItem -Path .. -Recurse"
-          else
-            ls -R ..
-          fi
+            mkdir SDL_ttf
+            cd SDL_ttf
+            ..\..\build-sdl-ttf.bat ${{ matrix.cmake_tuple }}
+            cd ..
+        shell: cmd
+
+      - name: Build OpenSSL
+        run: |
+            mkdir openssl
+            cd openssl
+            ..\build-openssl.bat ${{ matrix.openssl_build_tuple }}
+            cd ..
+        if: matrix.os == 'windows-latest'
+        shell: cmd
+
+      - name: Build OpenSSL (macOS and Linux)
+        run: |
+            mkdir openssl
+            cd openssl
+            ../build-openssl.sh x64 darwin64-x86_64-cc
+            ../build-openssl.sh arm64 darwin64-arm64-cc
+            cd ..
+        if: matrix.os != 'windows-latest'
+        shell: bash
+
+      - name: Build and setup libplacebo (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+            mkdir libplacebo
+            cd libplacebo
+            ..\build-libplacebo-windows.bat ${{ matrix.libplacebo_build_tuple }}
+            cd ..
+        shell: cmd
+
+      - name: Build dav1d
+        run: |
+            mkdir dav1d
+            cd dav1d
+            ..\..\build-dav1d.bat ${{ matrix.ffmpeg_build_tuple }}
+            cd ..
+        if: matrix.os == 'windows-latest'
+        shell: cmd
+
+      - name: Build dav1d (non-Windows)
+        run: |
+            mkdir dav1d
+            cd dav1d
+            ../../build-dav1d.sh
+            cd ..
+        if: matrix.os != 'windows-latest'
         shell: bash
 
       - name: Archive Artifacts
@@ -97,6 +141,62 @@ jobs:
         run: cmd /c archive.bat ${{ matrix.platform }}
         shell: cmd
 
+      - name: Build FFmpeg (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+            mkdir FFmpeg
+            cd FFmpeg
+            ..\build-ffmpeg-windows.bat ${{ matrix.ffmpeg_build_tuple }}
+            cd ..
+        shell: cmd
+
+      - name: Build FFmpeg (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+            mkdir FFmpeg
+            cd FFmpeg
+            ../build-ffmpeg-macos.sh x64 x86_64
+            ../build-ffmpeg-macos.sh arm64 arm64
+            cd ..
+        shell: bash
+
+      - name: Build Opus (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+            mkdir opus
+            cd opus
+            ..\..\build-opus.bat ${{ matrix.cmake_tuple }}
+            cd ..
+        shell: cmd
+
+      - name: Build Opus (non-Windows)
+        if: matrix.os != 'windows-latest'
+        run: |
+            mkdir opus
+            cd opus
+            ../../build-opus.sh x64 x86_64
+            ../../build-opus.sh arm64 arm64
+            cd ..
+        shell: bash
+
+      - name: Build discord-rpc (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          mkdir discord-rpc
+          cd discord-rpc
+          ..\..\build-discord-rpc.bat ${{ matrix.cmake_tuple }}
+          cd ..
+        shell: cmd
+  
+      - name: Build discord-rpc (non-Windows)
+        if: matrix.os != 'windows-latest'
+        run: |
+          mkdir discord-rpc
+          cd discord-rpc
+          ../../build-discord-rpc.sh x64 x86_64
+          ../../build-discord-rpc.sh arm64 arm64
+          cd ..
+        shell: bash
 
       - name: Upload Artifact (Zip)
         uses: actions/upload-artifact@v4
