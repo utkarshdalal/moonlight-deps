@@ -76,8 +76,9 @@ jobs:
       - name: Debug Build Output
         run: |
           echo "Listing contents of the build directory recursively:"
-          if [[ "${{ runner.os }}" == "Windows" ]]; then
-            dir /s ..
+          if [[ $RUNNER_OS == 'Windows' ]]; then
+            # Using Powershell command to list directories since 'dir' is not directly compatible in bash on Windows
+            powershell -Command "Get-ChildItem -Path .. -Recurse"
           else
             ls -R ..
           fi
