@@ -73,16 +73,21 @@ jobs:
           cd ..
         shell: bash
 
+      - name: Debug Build Output
+        run: |
+          echo "Listing contents of the build directory recursively:"
+          if [[ "${{ runner.os }}" == "Windows" ]]; then
+            dir /s ..
+          else
+            ls -R ..
+          fi
+        shell: bash
+
       - name: Archive Artifacts
         if: ${{ runner.os == 'Windows' }}
         run: cmd /c archive.bat ${{ matrix.platform }}
         shell: cmd
 
-      - name: Debug Build Output
-        run: |
-          echo "Listing build directory:"
-          ls -R build
-        shell: bash
 
       - name: Upload Artifact (Zip)
         uses: actions/upload-artifact@v4
