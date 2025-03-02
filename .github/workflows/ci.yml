@@ -78,8 +78,18 @@ jobs:
         run: cmd /c archive.bat ${{ matrix.platform }}
         shell: cmd
 
-      - name: Upload Artifacts
+      - name: Debug Build Output
+        run: |
+          echo "Listing build directory:"
+          ls -R build
+        shell: bash
+
+      - name: Upload Artifact (Zip)
         uses: actions/upload-artifact@v4
         with:
           name: build-${{ matrix.platform }}
-          path: path/to/artifacts
+          path: windows-${{ matrix.platform }}.zip
+          if-no-files-found: error
+          compression-level: 6
+          overwrite: false
+          include-hidden-files: false
